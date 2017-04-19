@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  <Product Id="*" Name="OpenInChrome" Language="1033" Version="1.2.0.0" Manufacturer="BaskarDevOps" UpgradeCode="1e3fb1ac-8a90-4c63-9aa3-f8db50612211">
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine"/>
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+	<Feature Id="ProductFeature" Title="OpenInChrome" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="RegistryComponents" />
+    </Feature>
+
+	<!-- To uninstall previous versions while installing a newer version -->
+	
+    <Property Id="PREVIOUSVERSIONSINSTALLED" Secure="yes" />
+    <Upgrade Id="1e3fb1ac-8a90-4c63-9aa3-f8db50612211">
+      <UpgradeVersion Minimum="1.0.0.0" Maximum="99.0.0.0" IncludeMaximum="no" IncludeMinimum="yes" Property="PREVIOUSVERSIONSINSTALLED" />
+    </Upgrade>
+  </Product>
+
+
+    <!-- Create a directory -->
+  
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="BaskarDevOps">
+          <Directory Id="INSTALLFOLDER_1" Name="OpenInChrome" />
+        </Directory>
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER_1">
+      
+	  <!-- Define the file source. There is a referenced c# project which builds the required exe which needs to be copied to a folder while installing the msi -->
+	  
+      <Component Id="Exe" Guid="958f9882-4dbb-452d-9d48-039ad2302259">        
+        <File Source="$(var.OpenInChrome.TargetPath)" />
+      </Component>
+      
+    </ComponentGroup>
+	
+	<!-- Required Registry installation -->
+	
+    <ComponentGroup Id="RegistryComponents" Directory="TARGETDIR">
+	
+      <Component Id="RegistryCommon" Guid="795b411c-ae33-4e97-b30b-4584c5b405a4">
+        <RegistryKey Root="HKCR" Key="OpenInChrome" Action="createAndRemoveOnUninstall">
+          <RegistryValue Name="URL Protocol" Value="" Type="string"/>
+        </RegistryKey>
+      </Component>
+
+      <Component Id="RegistryCommon_1" Guid="e0f9dd5e-5e4d-4d40-9cbf-721df2379b03">
+        <RegistryKey Root="HKCR" Key="OpenInChrome" Action="createAndRemoveOnUninstall">
+          <RegistryValue Value="URL:OpenInChrome Protocol" Type="string"/>
+        </RegistryKey>
+      </Component>
+
+      <Component Id="RegistryCommon_2" Guid="3cb3b20a-0c1e-4704-8c74-72cb9e8a68f3">
+        <RegistryKey Root="HKCR" Key="OpenInChrome\DefaultIcon" Action="createAndRemoveOnUninstall">
+          <RegistryValue Value="X:\BaskarDevOps\OpenInChrome\OpenInChrome.exe,1" Type="string"/>
+        </RegistryKey>
+      </Component>
+     
+      <Component Id="RegistryCommon_3" Guid="264e82ef-a4d8-45e4-9598-1763a0030314">
+        <RegistryKey Root="HKCR" Key="OpenInChrome\shell\open\command" Action="createAndRemoveOnUninstall">
+          <RegistryValue Value="X:\BaskarDevOps\OpenInChrome\OpenInChrome.exe %1" Type="string"/>
+        </RegistryKey>
+      </Component>
+      
+    </ComponentGroup>
+  </Fragment>
+</Wix>
